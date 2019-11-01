@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.2.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+    
+    <!-- 读取数据源 -->
+    <context:property-placeholder location="classpath:datasource.properties"/>
+    
+    <!-- 定义数据源 -->  
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+    	<property name="driverClassName" value="${driver}"/>
+    	<property name="url" value="${url}"/>
+    	<property name="username" value="root"/>
+    	<property name="password" value="root"/>
+    	<property name="initialSize" value="${initialSize}"/>
+    	<property name="maxActive" value="${maxActive}"/>
+    	<property name="maxIdle" value="${maxIdle}"/>
+    	<property name="minIdle" value="${minIdle}"/>
+    	<property name="maxWait" value="${maxWait}"/>
+    	<property name="removeAbandoned" value="${removeAbandoned}"/>
+    	<property name="removeAbandonedTimeout" value="${removeAbandonedTimeout}"/>
+    	<!-- sql心跳 -->
+    	<property name="testWhileIdle" value="true"/>
+    	<property name="testOnBorrow" value="false"/>
+    	<property name="testOnReturn" value="false"/>
+    	<property name="validationQuery" value="select 1"/>
+    	<property name="timeBetweenEvictionRunsMillis" value="60000"/>
+    	<property name="numTestsPerEvictionRun" value="${maxActive}"/>
+    </bean>
+    
+    <!-- 定义工厂  -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    	<property name="dataSource" ref="dataSource"/>
+    	<!-- 扫描 mybatis 配置文件 -->
+    	<property name="configLocation" value="classpath:Mybatis_Config.xml"/>
+    	<!-- 给 实体类定义别名 -->
+    	<property name="typeAliasesPackage" value="cn.bdqn.domain"/>
+    </bean>
+    
+    <!-- 扫描 dao层 mapper 文件 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+    	<property name="basePackage" value="cn.bdqn.dao"/>
+    </bean>
+    
+    <!-- 扫描service层注解 -->
+    <context:component-scan base-package="cn.bdqn.service"/>
+    
+    <!-- 定义事务管理器 -->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    	<property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    <!-- 设置事务属性 -->
+  	<tx:advice id="txAdvice" transaction-manager="txManager">
+    	<tx:attributes>
+    		<tx:method name="find*" read-only="true" propagation="SUPPORTS"/>
+    		<tx:method name="add*" propagation="REQUIRED"/>
+    		<tx:method name="del*" propagation="REQUIRED"/>
+    		<tx:method name="update*" propagation="REQUIRED"/>
+    		<tx:method name="*" propagation="REQUIRED"/>
+    	</tx:attributes>
+    </tx:advice>
+   
+    <!-- 定义切面 -->
+    <aop:config>
+    	<aop:pointcut expression="execution(* cn.bdqn.service..*.*(..))" id="pointcut"/>
+    	<aop:advisor advice-ref="txAdvice" pointcut-ref="pointcut"/>
+    </aop:config>
+</beans>

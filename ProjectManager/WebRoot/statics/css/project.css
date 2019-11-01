@@ -1,0 +1,41 @@
+*{
+	margin: 0 auto;
+	text-decoration:none;
+}
+#div_1{
+	width: 700px;
+	margin: 10 auto;
+	height: 20px;
+	text-align:left;
+}
+#div_2{
+	width: 700px;
+	margin: 0 10 0 10 auto;
+	height: 170px;
+	text-align:center;
+	border:1px solid grey;
+}
+h1{
+	text-align:center;
+}
+table{
+	width:700px;
+}
+table tr th{
+	text-align:center;
+	border:1px solid grey;
+	background-color:lightgrey;
+}
+table tr td{
+	text-align:center;
+	border:1px solid grey;
+}
+p{
+	text-align:right;
+}
+
+
+
+
+
+
