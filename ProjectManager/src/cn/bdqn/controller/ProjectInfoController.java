@@ -18,6 +18,9 @@ import cn.bdqn.service.ProjectInfoService;
 @RequestMapping("/project")
 public class ProjectInfoController {
 	
+	/**
+	 * service 层
+	 */
 	@Resource
 	private ProjectInfoService infoService; 
 	
